@@ -1,13 +1,29 @@
-name: Manual workflow
+name: Run sample tests (manual)
 
 on:
-  workflow_dispatch
-  
+  workflow_dispatch:
+
 jobs:
   test:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
     steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up JDK
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '21'
+
+    - name: Cache Maven packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+
     - name: Run tests
-      run: mvn clean test
+      run: mvn test
